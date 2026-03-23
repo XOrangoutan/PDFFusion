@@ -10,12 +10,20 @@ set /p nom="Entrez le nom du fichier final (ex: fusion.pdf) :"
 :: Dossier cible (Optionnel: dossier source si vide)
 set /p dest="Copier le chemin du dossier de destination (Optionnel: dans le dossier souce si vous appuyez sur entrée):"
 
+:: Ajout d'une page de garde (Oui/Non, par défaut: Non)
+set pagegarde="N"
+set /p pagegarde="page de garde entre les fichiers(O: Oui/N: Non)[par défaut: Non]:"
+
 :: Lancer le script Python avec les arguments
 :: On utilise les guillemets au cas où il y aurait des espaces
 if "%dest%"=="" (
-    python C:\devs_source\python\PDFFusion\pdffusion.py "%src%" "%nom%"
-) else (
-    python C:\devs_source\python\PDFFusion\pdffusion.py "%src%" "%nom%" "%dest%"
+    set dest=%src%
 )
+if /I "%pagegarde%"=="O" (
+    set "add_file_name=True"
+) else (
+    set "add_file_name=False"
+)
+python C:\devs_source\python\PDFFusion\pdffusion.py "%src%" "%nom%" "%dest%" "%add_file_name%"
 echo Operation terminee !
 pause
