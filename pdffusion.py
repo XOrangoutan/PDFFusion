@@ -65,7 +65,7 @@ def fusionner_pdfs(repertoire_source, repertoire_cible, nom_sortie, add_file_nam
         merger.append(chemin_complet)
 
     # Sauvegarde du résultat
-    chemin_sortie = os.path.join(repertoire_cible,  f"{nom_sortie}_{file_number}")
+    chemin_sortie = os.path.join(repertoire_cible,  f"{file_number}_{nom_sortie}")
     with open(chemin_sortie, "wb") as f_sortie:
         merger.write(f_sortie)
     
