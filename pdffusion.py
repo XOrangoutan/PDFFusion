@@ -19,6 +19,8 @@ nom_fichier_final = sys.argv[2]
 dossier_cible = sys.argv[3] if len(sys.argv) > 3 else sys.argv[1] 
 # Permet d'ajouter une page de garde avec le nom du fichier entre chaque PDF (optionnel, par défaut False)
 add_file_name = sys.argv[4].lower() == "true" if len(sys.argv) > 4 else False
+# Permet de lotir le résultat par paquet de la taille donnée(optionnel, par défaut 0)
+lot_size = int(sys.argv[5]) if len(sys.argv) > 5 else 0
 
 # ---------------------
 # Fonction d'ajout d'une page de garde
@@ -34,9 +36,9 @@ def ajouter_page_de_garde(writer, fichier):
 # ---------------------
 # Fonction de fusion des PDF
 # ---------------------
-def fusionner_pdfs(repertoire_source, repertoire_cible, nom_sortie, add_file_name=False):
+def fusionner_pdfs(repertoire_source, repertoire_cible, nom_sortie, add_file_name=False, lot_size=0):
     merger = PdfWriter()
-    
+    file_number = 1
     # Récupérer et trier la liste des fichiers PDF
     fichiers = [f for f in os.listdir(repertoire_source) if f.endswith('.pdf')]
     fichiers.sort() # Trie par ordre alphabétique
@@ -44,8 +46,18 @@ def fusionner_pdfs(repertoire_source, repertoire_cible, nom_sortie, add_file_nam
     if not fichiers:
         print("Aucun fichier PDF trouvé dans le dossier.")
         return
-
+    idx=0
     for fichier in fichiers:
+        if lot_size > 0 and idx >= lot_size:
+            # Sauvegarder le lot actuel
+            chemin_sortie = os.path.join(repertoire_cible, f"{nom_sortie}_{file_number}")
+            with open(chemin_sortie, "wb") as f_sortie:
+                merger.write(f_sortie)
+            merger.close()
+            merger = PdfWriter()
+            file_number += 1
+            idx = 0
+        idx += 1
         chemin_complet = os.path.join(repertoire_source, fichier)
         print(f"Ajout de : {fichier}")
         if add_file_name:
@@ -53,12 +65,12 @@ def fusionner_pdfs(repertoire_source, repertoire_cible, nom_sortie, add_file_nam
         merger.append(chemin_complet)
 
     # Sauvegarde du résultat
-    chemin_sortie = os.path.join(repertoire_cible, nom_sortie)
+    chemin_sortie = os.path.join(repertoire_cible,  f"{nom_sortie}_{file_number}")
     with open(chemin_sortie, "wb") as f_sortie:
         merger.write(f_sortie)
     
     merger.close()
-    print(f"\nSuccès ! Fichier fusionné créé ici : {chemin_sortie}")
+    print(f"\nSuccès ! Fichier(s) fusionné(s) créé(s) ici : {repertoire_cible}")
 
 if __name__ == "__main__":
-    fusionner_pdfs(dossier_source, dossier_cible, nom_fichier_final, add_file_name)
+    fusionner_pdfs(dossier_source, dossier_cible, nom_fichier_final, add_file_name, lot_size)
