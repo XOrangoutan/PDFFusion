@@ -50,7 +50,7 @@ def fusionner_pdfs(repertoire_source, repertoire_cible, nom_sortie, add_file_nam
     for fichier in fichiers:
         if lot_size > 0 and idx >= lot_size:
             # Sauvegarder le lot actuel
-            chemin_sortie = os.path.join(repertoire_cible, f"{nom_sortie}_{file_number}")
+            chemin_sortie = os.path.join(repertoire_cible, f"{file_number}_{nom_sortie}")
             with open(chemin_sortie, "wb") as f_sortie:
                 merger.write(f_sortie)
             merger.close()
